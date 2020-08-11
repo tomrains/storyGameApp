@@ -1,0 +1,31 @@
+import React from 'react';
+
+// import Dropdown from 'react-bootstrap/Dropdown';
+
+class ChooseNumberOfRounds extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      //state here
+    }
+  }
+  render() {
+    return <div>
+    </div>;
+  }
+}
+
+export default ChooseNumberOfRounds;
+
+
+// <Dropdown>
+//   <Dropdown.Toggle variant="success" id="dropdown-basic">
+//     Number of Rounds
+//   </Dropdown.Toggle>
+//
+//   <Dropdown.Menu>
+//     <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+//     <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+//     <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+//   </Dropdown.Menu>
+// </Dropdown>
