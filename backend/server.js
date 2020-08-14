@@ -61,9 +61,14 @@ gameRoutes.route('/:code/:playerId/finalStory').get(function(req, res) {
         //can probably change the weird repetitive location to one variable
         // console.log(game.players);
         let storySpot = game.players[storyNeeded].story[i - 1];
+        //add space to end of line
         if (storySpot[storySpot.length - 1] !== " " && i !== rounds) {
-          // console.log("this guy needs a space!");
           storySpot = storySpot + " ";
+        }
+        //remove hanging space at beginning of line
+        if (storySpot[storySpot[0]] === " " && i !== rounds) {
+          // console.log("this guy needs a space!");
+          storySpot[0] = "";
         }
         chainedStory.push(storySpot);
       }
@@ -227,8 +232,11 @@ gameRoutes.route('/:code').put(function(req, res) {
 
 // Add the host after the game has been initialized in the backend with a code
 gameRoutes.route('/add/:code').put(function(req, res) {
-  console.log(req.body.code);
     Game.findOne({code: req.body.code}, function (err, game) {
+      if (!game) {
+        res.status(404).send("No game with that code exists!");
+        return;
+      }
       console.log(game);
       game.rounds = req.body.rounds;
       let hostPlayer = req.body.players;
@@ -236,12 +244,7 @@ gameRoutes.route('/add/:code').put(function(req, res) {
       //so now, just add functionality to update the stuff!
       //push the body to players
       // console.log(game.players[0].name);
-        if (err) {
-          res.status(404).send("data is not found");
-        }
-        else {
-          res.json(`You just added a new player`);
-        }
+      res.json(`You just added a new player`);
     });
 });
 

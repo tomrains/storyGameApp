@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Link } from 'react-router-dom';
 
+import "./storyrevealed.css";
+
 // import FullStory from './subcomponents/FullStory.js';
 // import GameMasterPlayAgain from './subcomponents/GameMasterPlayAgain.js';
 // import HideMyStory from './subcomponents/HideMyStory.js';
@@ -21,7 +23,8 @@ class Storyrevealed extends React.Component {
     //variables, logic and so on here
       return (
         <div>
-          {this.props.finalStory}
+          <h1>{this.props.playerName}'s Story</h1>
+          <p>{this.props.finalStory}</p>
           {this.props.isHost ? (
             <button class="btn btn-success">
               <Link to='/'>Start New Game</Link>

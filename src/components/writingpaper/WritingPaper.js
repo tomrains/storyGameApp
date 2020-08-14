@@ -47,7 +47,7 @@ class Writingpaper extends React.Component {
   componentDidMount() {
     this.hasEveryoneSubmitted();
     // pausing for now so it stops fetching lol
-    this.intervalID = setInterval(this.hasEveryoneSubmitted.bind(this), 5000);
+    this.intervalID = setInterval(this.hasEveryoneSubmitted.bind(this), 3000);
   }
 
   componentWillUnmount() {
@@ -67,7 +67,7 @@ class Writingpaper extends React.Component {
   // }
 
   hasEveryoneSubmitted = () => {
-    if (this.state.storySubmitted) {
+    if (this.state.storySubmitted && !this.props.hasFinalStory) {
     // list what this should do
     axios.get(`http://localhost:4000/games/${this.props.gameId}/storiesSubmitted`)
       .then(res => this.setState({ everyoneHasSubmitted: res.data }));
@@ -78,6 +78,8 @@ class Writingpaper extends React.Component {
       }
       axios.get(`http://localhost:4000/games/${this.props.gameId}/${this.props.playerNumber}/finalStory`, info)
         .then(res => this.props.updateFinalStory(res.data))
+        .then(this.props.updateHasFinalStory())
+        .then(this.setState({ storySubmitted: true })); //might not need this part due to logic in render. test?
     }
     if (this.state.everyoneHasSubmitted && this.state.previousPersonsWriting === "Empty" && !this.props.isLastRound) {
       console.log("do the request for the story that is rightfully yours");
@@ -138,6 +140,7 @@ class Writingpaper extends React.Component {
   //This function sends the writing to the backend
   //First, we'll try to send it to that player. Eventually, it will go to the player who originally wrote it
   putWriting = (e) => {
+    e.preventDefault();
     console.log("and here we are");
     let playerStory = {
       code: this.props.gameId,
@@ -157,7 +160,7 @@ class Writingpaper extends React.Component {
   }
 
   deleteDefaultText = (e) => {
-    if (e.target.value === "Begin your story here" || e.target.value === "Continue the story here") {
+    if (e.target.value === "Begin your story here" || e.target.value === "Continue the story here" || e.target.value === "Finish the story here") {
       e.target.value = "";
     }
   }
@@ -171,6 +174,10 @@ class Writingpaper extends React.Component {
     this.setState({ submitStory: false });
   }
 
+  quitGame = () => {
+    console.log("They're ready to quit!");
+  }
+
   // waitText = () => {
   //   return "Oh wow!";
   //   // return '<div>'+'<p>Waiting for everyone to finish the round.</p>'+'<p>In the meantime, enjoy this dancing unicorn</p>'+'</div>';
@@ -179,7 +186,7 @@ class Writingpaper extends React.Component {
   render() {
     let waitText = "";
     if (!this.props.finalStory) {
-      waitText = "Just waiting on some people to finish."
+      waitText = "Just waiting on everyone to finish."
     }
     else {
       waitText = null;
@@ -198,10 +205,10 @@ class Writingpaper extends React.Component {
       return (
         //the organization here is wrong, but the components are there
         <div>
-          {!this.state.storySubmitted ? (
+          {!this.state.storySubmitted && !this.props.hasFinalStory ? (
           <div>
           <h1>Your Story</h1>
-            <p>Round {this.props.currentRound}</p>
+            <p>Round {this.props.currentRound} of {this.props.rounds}</p>
             {this.props.currentRound === 1 ? (
               <div>
               </div>
@@ -275,14 +282,6 @@ class Writingpaper extends React.Component {
                 )
               }
 
-              {this.props.isHost && !this.state.endGame ? (
-                <button>End Game</button>
-                ) : (
-                <div>
-                </div>
-                )
-              }
-
               {this.props.isHost && this.state.endGame ? (
                 <p>
                   <button>Are you sure you want to end the game for everyone?</button>
@@ -291,31 +290,6 @@ class Writingpaper extends React.Component {
                 </p>
                 ) : (
                 <div>
-                </div>
-                )
-              }
-
-              {this.props.isHost ? (
-                <div>
-                  <p>
-                    <button>Make this the last round (make this toggle)</button>
-                  </p>
-                </div>
-                ) : (
-                <div>
-                </div>
-                )
-              }
-
-              {this.state.needHelp ? (
-                <div>
-                  <p>
-                    Helpy stuff here
-                  </p>
-                </div>
-                ) : (
-                <div>
-                  <button>Help</button>
                 </div>
                 )
               }
@@ -330,11 +304,11 @@ class Writingpaper extends React.Component {
 
         {this.props.finalStory ? (
           <div>
-            <p>
+            <p>Everyone's turned in their story.</p>
+            <p>Reveal yours below.</p>
             <button type="button"className="btn btn-success">
               <Link to='/story'>Reveal My Story</Link>
             </button>
-            </p>
           </div>
         ) : (
           <div>
@@ -365,3 +339,36 @@ export default Writingpaper;
 // <ThanksForWritingNowWait />
 // <TheEndButton />
 // <ThreeNewLines />
+
+/*{this.props.isHost ? (
+  <div>
+    <p>
+      <button>Make this the last round (make this toggle)</button>
+    </p>
+  </div>
+  ) : (
+  <div>
+  </div>
+  )
+}
+
+{this.props.isHost && !this.state.endGame ? (
+  <button>End Game</button>
+  ) : (
+  <div>
+  </div>
+  )
+}
+
+{this.state.needHelp ? (
+  <div>
+    <p>
+      Helpy stuff here
+    </p>
+  </div>
+  ) : (
+  <div>
+    <button>Help</button>
+  </div>
+  )
+}*/

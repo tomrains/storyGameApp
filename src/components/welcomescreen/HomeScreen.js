@@ -14,7 +14,8 @@ class HomeScreen extends React.Component {
       playerAvatar: null,
       rounds: null,
       gameIdUrl: null,
-      test: null
+      test: null,
+      playerSubmitted: false
     }
   }
 
@@ -59,6 +60,9 @@ class HomeScreen extends React.Component {
   }
 
   createGame = (e) => {
+    if (this.state.playerSubmitted) {
+      return;
+    }
     e.preventDefault();
     this.props.updateHost();
     let newGameInfo = {
@@ -74,6 +78,7 @@ class HomeScreen extends React.Component {
     axios.put('http://localhost:4000/games/add/:code', newGameInfo)
         .then(res => console.log(res.data));
         this.props.updatePlayerNumber(0);
+        this.setState({ playerSubmitted: true });
   }
 
 
@@ -108,9 +113,19 @@ class HomeScreen extends React.Component {
               </select>
             </div>
 
-            <button variant="primary" type="submit" onClick={this.createGame}>
-              <Link to='/waitscreen'>Create Game</Link>
-            </button>
+            {!this.props.playerName ||
+              !this.props.playerAvatar ||
+              !this.props.rounds ? (
+              <button disabled type="button" className="btn btn-success">Create Game</button>
+              ) : (
+              <div>
+                <button type="button" className="btn btn-success" onClick={this.createGame}>
+                  <Link to='/waitscreen'>Create Game</Link>
+                </button>
+              </div>
+              )
+            }
+
           </form>
         </div>
       )

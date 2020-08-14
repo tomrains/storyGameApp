@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+// import "./App.css";
 import axios from 'axios';
 
 import CreateGame from "./components/create-game.component";
@@ -32,7 +33,8 @@ class App extends Component {
       doesGameIdExist: null,
       isHost: false,
       isLastRound: false,
-      finalStory: null
+      finalStory: null,
+      hasFinalStory: false
     }
     this.updatePlayers = this.updatePlayers.bind(this);
   }
@@ -137,6 +139,10 @@ class App extends Component {
     this.setState({ finalStory: finalStory })
   }
 
+  updateHasFinalStory = () => {
+    this.setState({ hasFinalStory: true })
+  }
+
   startGame = () => {
     if (this.state.isHost) {
       axios.put(`http://localhost:4000/games/${this.state.gameId}/startGame`)
@@ -180,10 +186,14 @@ class App extends Component {
             updateGameId = {this.updateGameId}
             updateGameIdUrl = {this.updateGameIdUrl}
             updatePlayerNumber = {this.updatePlayerNumber}
-            howManyRounds = {this.howManyRounds}/ >
+            howManyRounds = {this.howManyRounds}
+            playerName = {this.state.playerName}
+            playerAvatar = {this.state.playerAvatar}
+            updateName = {this.updateName}
+            updateAvatar = {this.updateAvatar} />
             )}
           />
-          <Route path="/filler3" render={(props) => (
+          <Route path="/lab" render={(props) => (
             <StoryConcealed {...props}
             test1 = {this.test1}
             playerNumber = {this.state.playerNumber} />
@@ -194,7 +204,9 @@ class App extends Component {
             test1 = {this.test1}
             playerNumber = {this.state.playerNumber}
             finalStory = {this.state.finalStory}
-            isHost={this.state.isHost} />
+            isHost={this.state.isHost}
+            playerName = {this.state.playerName}
+            playerAvatar = {this.state.playerAvatar} />
           )}
           />
           <Route exact path="/" render={(props) => (
@@ -227,7 +239,9 @@ class App extends Component {
             isLastRound = {this.state.isLastRound}
             rounds = {this.state.rounds}
             finalStory = {this.state.finalStory}
-            updateFinalStory = {this.updateFinalStory}/>
+            updateFinalStory = {this.updateFinalStory}
+            hasFinalStory={this.state.hasFinalStory}
+            updateHasFinalStory={this.updateHasFinalStory} />
           )}
           />
         </div>

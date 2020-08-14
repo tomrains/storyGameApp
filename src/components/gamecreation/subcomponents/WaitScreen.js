@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import "./waitscreen.css";
 // import Form from 'react-bootstrap/Form';
 // import Button from 'react-bootstrap/Button';
 // import Dropdown from 'react-bootstrap/Dropdown';
@@ -11,7 +12,8 @@ class WaitScreen extends React.Component {
     super(props);
     this.state = {
       gameInfo: "Default",
-      gameStarted: false
+      gameStarted: false,
+      copySuccess: ''
     }
   }
 
@@ -20,7 +22,7 @@ class WaitScreen extends React.Component {
   componentDidMount() {
     this.getPlayers();
     // pausing for now so it stops fetching lol
-    this.intervalID = setInterval(this.getPlayers.bind(this), 5000);
+    this.intervalID = setInterval(this.getPlayers.bind(this), 3000);
   }
 
   // updateRounds = (e) => {
@@ -63,7 +65,8 @@ class WaitScreen extends React.Component {
     }
   }
 
-  beginGame = () => {
+  beginGame = (e) => {
+    e.preventDefault();
     console.log("begin game functionality will go here");
     //do a put request to server to begin game
     let gameStatus = {
@@ -72,6 +75,15 @@ class WaitScreen extends React.Component {
     axios.put(`http://localhost:4000/games/${this.props.gameId}/startGame`, gameStatus)
   }
 
+  copyToClipboard = (e) => {
+  this.textArea.select();
+  document.execCommand('copy');
+  // This is just personal preference.
+  // I prefer to not show the whole text area selected.
+  e.target.focus();
+  this.setState({ copySuccess: ' Copied!' });
+};
+
   render() {
     let players = this.state.gameInfo;
     let playerBoard = [];
@@ -79,14 +91,24 @@ class WaitScreen extends React.Component {
       playerBoard.push(players[i].name);
     }
     return (
+      <div>
       <div className="first">
         <h1>The Waitroom</h1>
         <form>
           <div className="form-group" controlId="exampleForm.ControlTextarea1">
             <h2>Invite your friends!</h2>
-            <textarea className="form-control" defaultValue={this.props.gameIdUrl}/>
+            <textarea className="form-control" value={this.props.gameIdUrl} ref={(textarea) => this.textArea = textarea}/>
           </div>
         </form>
+        {
+         /* Logical shortcut for only displaying the
+            button if the copy command exists */
+         document.queryCommandSupported('copy') &&
+          <div>
+            <button onClick={this.copyToClipboard}>Copy</button>
+            {this.state.copySuccess}
+          </div>
+        }
         <h2>Who's Joined:</h2>
         {this.state.gameInfo !== "Default" && this.state.gameInfo !== null ? (
           <div>
@@ -107,54 +129,16 @@ class WaitScreen extends React.Component {
           </div>
         ) : (
           <div>
-            <button type="button"class="btn btn-success" onClick={this.props.startGame}>
+            <button type="button"className="btn btn-success" onClick={this.props.startGame}>
               <Link to='/writing'>Start Game</Link>
             </button>
           </div>
         )}
       </div>
+      </div>
     )
   }
 }
 
-//
-// <!-- The text field -->
-// <input type="text" value="Hello World" id="myInput">
-//
-// <!-- The button used to copy the text -->
-// <button onclick="myFunction()">Copy text</button>
 
 export default WaitScreen;
-
-
-//before it tear up this stuff
-{/*this.state.gameInfo ? (
-  <div>
-    {players.map((item) => {
-      return(
-        <div>
-          {item}
-        </div>
-      )
-    })}
-  </div>
-) : (
-  <div>No one's joined yet </div>
-)*/}
-
-{/*if (this.props.isHost) (
-  <button type="button"class="btn btn-success" onClick={this.beginGame}>
-    <Link to='/writing'>Begin Game</Link>
-  </button>
-) : (
-  {!this.state.gameStarted ? (
-    <div>
-      Waiting for the host to begin the game...
-    </div>
-  ) :
-(
-  <button type="button"class="btn btn-success">
-    <Link to='/writing'>Get writing!</Link>
-  </button>
-)
-)}*/}

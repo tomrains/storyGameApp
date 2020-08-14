@@ -14,31 +14,37 @@ class Join extends React.Component {
       code: null,
       playerName: null,
       playerAvatar: null,
+      playerSubmitted: false,
     }
   }
 
-  updateName = (e) => {
-    this.setState({ playerName: e.target.value });
-  }
-
-  updateAvatar = (e) => {
-    this.setState({ playerAvatar: e.target.value });
-  }
+  // updateName = (e) => {
+  //   this.setState({ playerName: e.target.value });
+  // }
+  //
+  // updateAvatar = (e) => {
+  //   this.setState({ playerAvatar: e.target.value });
+  // }
 
   // updateCode = (e) => {
   //   this.setState({ gameCode: e.target.value });
   // }
 
   putPlayer = (e) => {
-    let player = {
-      name: this.state.playerName,
-      avatar: this.state.playerAvatar
+    //don't submit information twice
+    if (this.state.playerSubmitted) {
+      return;
     }
-    e.preventDefault();
+    // e.preventDefault();
+    let player = {
+      name: this.props.playerName,
+      avatar: this.props.playerAvatar
+    }
     console.log(player);
     console.log(`the gameid in putPlayer is: ${this.props.gameId}`);
     axios.put(`http://localhost:4000/games/${this.props.gameId}`, player)
-    .then(playerNumber => this.props.updatePlayerNumber(playerNumber.data));
+    .then(playerNumber => this.props.updatePlayerNumber(playerNumber.data))
+    .then(this.setState({ playerSubmitted: true }));
 
 
 
@@ -90,16 +96,16 @@ class Join extends React.Component {
 
   render() {
     return <div>
-    <h2> About to join game {this.state.gameCode} </h2>
+    <h2> About to join game {this.props.gameId} </h2>
     <form>
       <div className="form-group">
         <label>Name</label>
-        <input placeholder="Enter name" onChange={this.updateName} />
+        <input placeholder="Enter name" onChange={this.props.updateName} />
       </div>
 
       <div className="form-group">
         <label>Select avatar</label>
-        <select multiple className="form-control" onChange={this.updateAvatar}>
+        <select multiple className="form-control" onChange={this.props.updateAvatar}>
           <option>Avatar 1</option>
           <option>Avatar 2</option>
           <option>Avatar 3</option>
@@ -108,16 +114,17 @@ class Join extends React.Component {
         </select>
       </div>
 
-
-      {/*<Link to={'./'}>*/}
-        <button type="button"className="btn btn-success" onClick={this.putPlayer}>
-          <Link to='/waitscreen'>Join Game</Link>
-        </button>
-      {/*</Link>*/}
+      {!this.props.playerName || !this.props.playerAvatar ? (
+        <button disabled type="button" className="btn btn-success">Join Game</button>
+        ) : (
+        <div>
+          <button type="button"className="btn btn-success" onClick={this.putPlayer}>
+            <Link to='/waitscreen'>Join Game</Link>
+          </button>
+        </div>
+        )
+      }
       </form>
-      <div>
-        {/* {this.state.allPlayers} need to figure out how to map tru this */}
-      </div>
     </div>;
   }
 }
